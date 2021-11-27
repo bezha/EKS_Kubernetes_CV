@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cv-bezha
+  namespace: cv-bezha-app
+  labels:
+    app: cv-bezha-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cv-bezha-app
+  template:
+    metadata:
+      labels:
+        app: cv-bezha-app
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+                - arm64
+      containers:
+      - name: cv-bezha-app
+        image: bezhav/static_cv:v1
+        ports:
+        - name: http
+          containerPort: 80
+        imagePullPolicy: IfNotPresent
+      nodeSelector:
+        kubernetes.io/os: linux
